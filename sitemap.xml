@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://difeizheng.github.io/weekly-report-generator/</loc><priority>0.9</priority></url>
-  <url><loc>https://difeizheng.github.io/weekly-report-generator/en/</loc><priority>0.7</priority></url>
-  <url><loc>https://difeizheng.github.io/csv-cleaner/</loc><priority>0.9</priority></url>
-  <url><loc>https://difeizheng.github.io/csv-cleaner/en/</loc><priority>0.7</priority></url>
-  <url><loc>https://difeizheng.github.io/resume-jd-matcher/</loc><priority>0.9</priority></url>
-  <url><loc>https://difeizheng.github.io/resume-jd-matcher/en/</loc><priority>0.7</priority></url>
-  <url><loc>https://difeizheng.github.io/prompt-builder/</loc><priority>0.9</priority></url>
-  <url><loc>https://difeizheng.github.io/prompt-builder/en/</loc><priority>0.7</priority></url>
-  <url><loc>https://difeizheng.github.io/md-converter/</loc><priority>0.9</priority></url>
-  <url><loc>https://difeizheng.github.io/md-converter/en/</loc><priority>0.7</priority></url>
+  <url><loc>https://learnmilo.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://learnmilo.com/weekly-report-generator/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://learnmilo.com/weekly-report-generator/en/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://learnmilo.com/csv-cleaner/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://learnmilo.com/csv-cleaner/en/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://learnmilo.com/resume-jd-matcher/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://learnmilo.com/resume-jd-matcher/en/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://learnmilo.com/prompt-builder/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://learnmilo.com/prompt-builder/en/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://learnmilo.com/md-converter/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://learnmilo.com/md-converter/en/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
