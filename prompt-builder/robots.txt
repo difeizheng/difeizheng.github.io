@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://difeizheng.github.io/prompt-builder/sitemap.xml

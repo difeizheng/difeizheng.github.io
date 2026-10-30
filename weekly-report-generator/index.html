@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="google-site-verification" content="YbZyC8tnLwjXaT5WduW-xmKcjuYlAW49wBzRLLLR_do" />
+<meta name="google-site-verification" content="4dYRUWFhTPLt_8QpztnIVGH1mWiWA6UJEheHPlloxYs" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周报生成器 - 免费在线生成三段式周报 | 让老板一眼看懂</title>
+<meta name="description" content="免费在线周报生成器：把工作碎片整理成「进展/风险/请求」三段式周报，格式专业、老板一眼看懂。纯本地运行，数据不上传，支持复制与下载。">
+<meta name="keywords" content="周报生成器,周报模板,日报生成,工作总结生成器,免费周报">
+<link rel="canonical" href="./">
+<style>
+  :root{--bg:#1f2a44;--card:#26324f;--ink:#eef2fa;--sub:#9fb0d0;--accent:#ffd166;--accent2:#2ec4b6;--line:#3a4a6e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.7 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 16px}
+  h1{font-size:30px;margin:8px 0 4px}
+  h1 .mark{color:var(--accent)}
+  .sub{color:var(--sub);margin-bottom:20px}
+  h2{font-size:20px;margin:28px 0 12px;color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  label{display:block;font-size:14px;color:var(--sub);margin:10px 0 4px}
+  input,select,textarea{width:100%;background:#1a2338;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:15px/1.5 inherit}
+  textarea{resize:vertical}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .row>*{flex:1;min-width:120px}
+  .row .narrow{flex:0 0 110px}
+  .row .del{flex:0 0 44px;background:#3a2530;color:#ff9a9a;border:1px solid #5a3340;border-radius:8px;cursor:pointer}
+  button.primary{background:var(--accent);color:#1f2a44;font-weight:700;border:0;border-radius:10px;padding:12px 22px;font-size:17px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent2);border:1px solid var(--accent2);border-radius:10px;padding:10px 18px;cursor:pointer}
+  .tasks .row{margin-bottom:8px}
+  #out{min-height:280px;white-space:pre-wrap;font-family:Consolas,Menlo,monospace;font-size:14px}
+  .tip{color:var(--sub);font-size:13px;margin-top:6px}
+  .faq dt{color:var(--accent);margin-top:14px;font-weight:700}
+  .faq dd{color:var(--sub)}
+  .pro{border:1px dashed var(--accent);border-radius:12px;padding:16px;margin:16px 0}
+  footer{color:var(--sub);font-size:13px;margin-top:32px;border-top:1px solid var(--line);padding-top:14px}
+  a{color:var(--accent2)}
+  .lang{position:absolute;top:14px;right:16px}
+  .lang a{color:var(--sub);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang"><a href="en/">English →</a></div>
+  <h1>周报<span class="mark">生成器</span></h1>
+  <p class="sub">把工作碎片整理成「进展 / 风险 / 请求」三段式周报。纯本地运行，<b>数据不上传</b>，填完即生成。</p>
+
+  <div class="card">
+    <div class="row">
+      <div><label>姓名（可选）</label><input id="name" placeholder="你的名字"></div>
+      <div><label>周期</label><input id="period" placeholder="2026-10-27 ~ 10-31"></div>
+      <div class="narrow"><label>模板</label>
+        <select id="tpl">
+          <option value="std">标准三段式</option>
+          <option value="mini">极简三行</option>
+        </select>
+      </div>
+    </div>
+
+    <label>本周工作碎片（一行一条：任务名 | 状态 | 进度% | 备注）</label>
+    <div class="tip">状态可选：已完成 / 进行中 / 遇到问题 / 计划中。「遇到问题」的条目会自动进入风险区。</div>
+    <div id="tasks" class="tasks"></div>
+    <button class="ghost" onclick="addRow()">＋ 加一条</button>
+
+    <label>下周计划（一行一条，选填）</label>
+    <textarea id="nextweek" rows="3" placeholder="完成联调并提测&#10;输出二期方案初稿"></textarea>
+
+    <label>需要的支持 / 需要领导拍板的事（一行一条，选填）</label>
+    <textarea id="support" rows="2" placeholder="需要后端在周三前确认接口字段"></textarea>
+
+    <p style="margin-top:14px"><button class="primary" onclick="gen()">生 成 周 报</button></p>
+  </div>
+
+  <div class="card" id="resultCard" hidden>
+    <label>生成结果（可直接复制 / 下载）</label>
+    <textarea id="out"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="ghost" onclick="copyOut()">复制全文</button>
+      <button class="ghost" onclick="downloadOut()">下载 .md</button>
+    </div>
+    <p class="tip" id="copyTip"></p>
+  </div>
+
+  <div class="pro">
+    <b style="color:var(--accent)">Pro 版（即将上线）</b>
+    <p class="tip">进阶模板包：述职报告框架、月报自动合并、英文周报版本。本页免费功能永久免费。</p>
+    <!-- Lemon Squeezy 结算链接贴在这里：
+         <a class="primary" href="你的LS商品链接">获取 Pro 模板包</a> -->
+  </div>
+
+  <h2>怎么用：3 步生成一份让老板看得懂的周报</h2>
+  <div class="card">
+    <p><b>第 1 步：倒碎片。</b>把本周做过的事一行一条丢进来，不用管顺序和措辞，乱没关系。</p>
+    <p><b>第 2 步：标状态。</b>给每条标「已完成 / 进行中 / 遇到问题」，遇到问题的条目会自动归入风险区——风险写在周报里叫预警，拖到项目延期里才叫事故。</p>
+    <p><b>第 3 步：生成并核对。</b>工具只做结构整理，<b>不会编造任何内容</b>；生成后花 1 分钟核对数字，再交给老板。</p>
+  </div>
+
+  <h2>为什么是「三段式」</h2>
+  <div class="card">
+    <p>老板看周报要的不是你干了什么，而是：事情推进到哪了（进展）、什么在卡你（风险）、需要他拍板什么（请求）。三段式把信息按「决策价值」排列，让 30 秒的扫读就能拿到全部要点。</p>
+    <p style="margin-top:8px">写不出这三块，通常不是文笔问题，是没梳理清楚——所以本工具从「碎片输入」开始，梳理这步交给结构。</p>
+  </div>
+
+  <h2>常见问题</h2>
+  <dl class="faq card">
+    <dt>我的内容会被上传吗？</dt>
+    <dd>不会。本工具是纯前端页面，所有填写内容只存在于你的浏览器本地（localStorage 草稿），关闭页面后下次打开自动恢复。</dd>
+    <dt>和 AI 写周报有什么区别？</dt>
+    <dd>AI 需要把内容发给第三方；本工具离线可用、零泄漏风险，适合内容敏感的工作场景。两者可以配合：先用本工具定结构，需要润色再交给 AI。</dd>
+    <dt>「遇到问题」的条目会怎样？</dt>
+    <dd>自动进入「风险与卡点」区，并附上你写的备注。周报里主动暴露问题叫预警，是低成本表忠心的机会。</dd>
+    <dt>免费吗？</dt>
+    <dd>本页全部功能永久免费。后续 Pro 模板包（述职/月报/英文版）为付费内容，不强制。</dd>
+  </dl>
+
+  <footer>
+    © 2026 周报生成器 · 纯前端工具，数据不出浏览器 ·
+    <a href="https://github.com/" rel="nofollow">源码 / 反馈</a>
+  <div class="sister-links" style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:13px;color:var(--sub)">姊妹工具：<a href="/" style="color:var(--accent2)">工具箱首页</a> · <a href="/csv-cleaner/" style="color:var(--accent2)">CSV清理器</a> · <a href="/resume-jd-matcher/" style="color:var(--accent2)">简历JD匹配器</a> · <a href="/prompt-builder/" style="color:var(--accent2)">提示词生成器</a> · <a href="/md-converter/" style="color:var(--accent2)">MD转换器</a></div>
+  </footer>
+</div>
+
+<script>
+const STATUSES = ["已完成","进行中","遇到问题","计划中"];
+const $ = id => document.getElementById(id);
+
+function addRow(t={name:"",status:"进行中",pct:"",note:""}){
+  const div = document.createElement("div");
+  div.className = "row";
+  div.innerHTML =
+    '<input class="t-name" placeholder="任务名，如：供应商对账功能" value="'+esc(t.name)+'">'+
+    '<select class="t-status narrow">'+STATUSES.map(s=>'<option'+(s===t.status?' selected':'')+'>'+s+'</option>').join("")+'</select>'+
+    '<input class="t-pct narrow" type="number" min="0" max="100" placeholder="进度%" value="'+esc(t.pct)+'">'+
+    '<input class="t-note" placeholder="备注：状态变化/卡点/下一步" value="'+esc(t.note)+'">'+
+    '<button class="del" onclick="this.parentNode.remove()">×</button>';
+  $("tasks").appendChild(div);
+  save();
+}
+function esc(s){return String(s??"").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+function rows(){
+  return [...document.querySelectorAll("#tasks .row")].map(r=>({
+    name: r.querySelector(".t-name").value.trim(),
+    status: r.querySelector(".t-status").value,
+    pct: r.querySelector(".t-pct").value.trim(),
+    note: r.querySelector(".t-note").value.trim()
+  })).filter(t=>t.name);
+}
+function lines(id){return $(id).value.split("\n").map(s=>s.trim()).filter(Boolean);}
+
+function gen(){
+  const ts = rows();
+  if(!ts.length){alert("先至少填一条任务");return;}
+  const tpl = $("tpl").value;
+  const period = $("period").value.trim() || "本周";
+  const name = $("name").value.trim();
+  const head = (tpl==="std" ? "【周报】"+period+(name?"　"+name:"") : "【周报·极简】"+period+(name?" "+name:""));
+
+  const done = ts.filter(t=>t.status==="已完成");
+  const doing = ts.filter(t=>t.status==="进行中");
+  const risk = ts.filter(t=>t.status==="遇到问题");
+  const plan = ts.filter(t=>t.status==="计划中");
+
+  const progLine = t=>{
+    let s = "";
+    if(t.status==="已完成") s = t.name + "：已完成";
+    else s = t.name + "：完成度 " + (t.pct? t.pct+"%":"__") + "，" + (t.note||"推进中");
+    return "· " + s;
+  };
+
+  let out = "";
+  if(tpl==="std"){
+    out += head + "\n\n一、本周进展\n";
+    const L = [...done,...doing].map(progLine);
+    out += (L.length? L.join("\n") : "· （填任务后自动生成）") + "\n\n";
+    out += "二、风险与卡点\n";
+    out += (risk.length? risk.map(t=>"· "+t.name+"："+(t.note||"存在卡点，需关注")).join("\n") : "· 无") + "\n\n";
+    out += "三、需要支持 / 决策\n";
+    const sup = lines("support");
+    out += (sup.length? sup.map(s=>"· "+s).join("\n") : "· 无") + "\n\n";
+    out += "四、下周计划\n";
+    const nw = [...lines("nextweek"), ...plan.map(t=>t.name)];
+    out += (nw.length? nw.map(s=>"· "+s).join("\n") : "· （填下周计划）") + "\n";
+  }else{
+    const main = (done[0]||doing[0]);
+    out += head + "\n";
+    out += "1. 进展：" + (main? main.name + (main.pct? "（"+main.pct+"%）":"") + (main.note? "，"+main.note : "") : "__") + "\n";
+    out += "2. 计划：" + (lines("nextweek")[0] || (plan[0]? plan[0].name : "__")) + "\n";
+    out += "3. 需要：" + (lines("support")[0] || (risk[0]? "关注："+risk[0].name : "无")) + "\n";
+  }
+  $("out").value = out;
+  $("resultCard").hidden = false;
+  $("resultCard").scrollIntoView({behavior:"smooth"});
+}
+
+function copyOut(){
+  const v = $("out").value;
+  const ok = ()=>{ $("copyTip").textContent = "已复制 ✓"; setTimeout(()=>$("copyTip").textContent="",2000); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(v).then(ok).catch(()=>fallbackCopy(v,ok));
+  }else fallbackCopy(v,ok);
+}
+function fallbackCopy(v,ok){
+  const ta = document.createElement("textarea");
+  ta.value = v; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); ok(); }catch(e){ alert("复制失败，请手动全选复制"); }
+  document.body.removeChild(ta);
+}
+function downloadOut(){
+  const blob = new Blob([$("out").value], {type:"text/markdown;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "周报_"+($("period").value.trim()||Date.now())+".md";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function save(){
+  const data = {
+    name:$("name").value, period:$("period").value, tpl:$("tpl").value,
+    tasks: rows(), nextweek:$("nextweek").value, support:$("support").value
+  };
+  try{ localStorage.setItem("wrg_draft", JSON.stringify(data)); }catch(e){}
+}
+function load(){
+  try{
+    const d = JSON.parse(localStorage.getItem("wrg_draft")||"null");
+    if(!d) return false;
+    $("name").value = d.name||""; $("period").value = d.period||"";
+    $("tpl").value = d.tpl||"std"; $("nextweek").value = d.nextweek||""; $("support").value = d.support||"";
+    (d.tasks&&d.tasks.length? d.tasks : [{}]).forEach(t=>addRow(t));
+    return true;
+  }catch(e){ return false; }
+}
+document.addEventListener("input", save);
+document.addEventListener("change", save);
+if(!load()){ addRow(); addRow(); }
+</script>
+</body>
+</html>

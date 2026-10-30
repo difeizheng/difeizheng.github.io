@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="google-site-verification" content="YbZyC8tnLwjXaT5WduW-xmKcjuYlAW49wBzRLLLR_do" />
+<meta name="google-site-verification" content="4dYRUWFhTPLt_8QpztnIVGH1mWiWA6UJEheHPlloxYs" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSV Cleaner Online — Dedupe, Trim, Remove Empty Rows. Files Never Leave Your Browser</title>
+<meta name="description" content="Free online CSV cleaner: drag in a file and remove duplicate rows, empty rows and columns, and stray spaces. Auto-detects delimiters and encoding. 100% local processing — your file is never uploaded.">
+<meta name="keywords" content="csv cleaner online, dedupe csv, remove empty rows csv, local csv tool">
+<link rel="canonical" href="./">
+<style>
+  :root{--bg:#1f2a44;--card:#26324f;--ink:#eef2fa;--sub:#9fb0d0;--accent:#ffd166;--accent2:#2ec4b6;--line:#3a4a6e;--bad:#ff9a9a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px}
+  h1{font-size:30px;margin:8px 0 4px}
+  h1 .mark{color:var(--accent)}
+  .sub{color:var(--sub);margin-bottom:20px}
+  h2{font-size:20px;margin:28px 0 12px;color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--sub);cursor:pointer;transition:.2s}
+  .drop.over{border-color:var(--accent);color:var(--accent)}
+  label{display:block;font-size:14px;color:var(--sub);margin:10px 0 4px}
+  select,input{background:#1a2338;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:15px/1.5 inherit}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row label{margin:0}
+  button.primary{background:var(--accent);color:#1f2a44;font-weight:700;border:0;border-radius:10px;padding:12px 22px;font-size:17px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent2);border:1px solid var(--accent2);border-radius:10px;padding:10px 18px;cursor:pointer}
+  .stats{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+  .stat{background:#1a2338;border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:110px;text-align:center}
+  .stat b{display:block;font-size:22px;color:var(--accent)}
+  .stat span{font-size:12px;color:var(--sub)}
+  .stat.bad b{color:var(--bad)}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-top:10px}
+  th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  th{background:#1a2338;color:var(--accent);position:sticky;top:0}
+  .tblbox{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+  .tip{color:var(--sub);font-size:13px;margin-top:6px}
+  .faq dt{color:var(--accent);margin-top:14px;font-weight:700}
+  .faq dd{color:var(--sub)}
+  .pro{border:1px dashed var(--accent);border-radius:12px;padding:16px;margin:16px 0}
+  .ops{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+  .ops label{display:flex;gap:6px;align-items:center;background:#1a2338;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--ink);font-size:14px}
+  .ops input{width:auto}
+  footer{color:var(--sub);font-size:13px;margin-top:32px;border-top:1px solid var(--line);padding-top:14px}
+  a{color:var(--accent2)}
+  .lang{position:absolute;top:14px;right:16px}
+  .lang a{color:var(--sub);text-decoration:none}
+  #msg{color:var(--bad);font-size:14px;margin-top:8px;min-height:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang"><a href="../">中文 →</a></div>
+  <h1>CSV <span class="mark">Cleaner</span></h1>
+  <p class="sub">Drop a file and remove duplicate rows, empty rows and columns, and stray spaces. <b>100% local processing — your file is never uploaded.</b> Delimiters and encodings auto-detected.</p>
+
+  <div class="drop" id="drop">
+    <b>Drop your CSV here</b><br>or click to browse (processed locally, instant under 5MB)
+    <input type="file" id="file" accept=".csv,.txt,.tsv" hidden>
+  </div>
+  <div id="msg"></div>
+
+  <div class="card" id="optCard" hidden>
+    <div class="row">
+      <div><label>Delimiter</label>
+        <select id="delim">
+          <option value="auto">Auto-detect</option>
+          <option value=",">Comma ,</option>
+          <option value=";">Semicolon ;</option>
+          <option value="\t">Tab</option>
+        </select>
+      </div>
+      <div><label>Encoding</label>
+        <select id="enc">
+          <option value="auto">Auto (UTF-8 → GBK)</option>
+          <option value="utf-8">UTF-8</option>
+          <option value="gbk">GBK / GB18030</option>
+        </select>
+      </div>
+      <div><label>Header row</label>
+        <select id="header">
+          <option value="1">First row is header</option>
+          <option value="0">No header</option>
+        </select>
+      </div>
+      <div style="flex:0"><label>&nbsp;</label><button class="ghost" onclick="reparse()">Re-parse</button></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <label>Cleaning actions</label>
+    <div class="ops">
+      <label><input type="checkbox" id="opDup" checked> Remove duplicate rows</label>
+      <label><input type="checkbox" id="opEmptyRow" checked> Remove empty rows</label>
+      <label><input type="checkbox" id="opEmptyCol"> Remove empty columns</label>
+      <label><input type="checkbox" id="opTrim" checked> Trim whitespace</label>
+      <label><input type="checkbox" id="opCrlf" checked> Normalize quotes & line endings</label>
+    </div>
+
+    <p style="margin-top:10px">
+      <button class="primary" onclick="clean()">Clean & Preview</button>
+      <button class="ghost" onclick="downloadClean()" id="dlBtn" hidden>Download cleaned CSV</button>
+    </p>
+    <p class="tip" id="diffTip"></p>
+  </div>
+
+  <div class="card" id="prevCard" hidden>
+    <label>Cleaned preview (first 50 rows shown — the download contains everything)</label>
+    <div class="tblbox" id="tblbox"></div>
+  </div>
+
+  <div class="pro">
+    <b style="color:var(--accent)">Pro version (coming soon)</b>
+    <p class="tip">Batch multi-file processing, dedupe by column, regex replace, direct Excel export. Everything on this page stays free forever.</p>
+    <!-- Lemon Squeezy checkout:
+         <a class="primary" href="YOUR_LS_PRODUCT_URL">Get the Pro batch version</a> -->
+  </div>
+
+  <h2>Why a local cleaner instead of a spreadsheet</h2>
+  <div class="card">
+    <p>Three things spreadsheets handle badly: ① deduplicating hundreds of thousands of rows grinds them to a halt — this tool does it instantly; ② CSVs saved in non-UTF-8 encodings open as mojibake — this tool auto-detects; ③ online tools want your data uploaded — this one <b>never uploads anything</b> and works offline.</p>
+  </div>
+
+  <h2>FAQ</h2>
+  <dl class="faq card">
+    <dt>Is my file uploaded?</dt>
+    <dd>No. The file is read with the browser's built-in FileReader and processed entirely in your device's memory. It works offline.</dd>
+    <dt>The preview looks like mojibake — what now?</dt>
+    <dd>The file is probably GBK-encoded but was read as UTF-8. Set Encoding to "Auto" (or GBK) and hit Re-parse.</dd>
+    <dt>What is a delimiter?</dt>
+    <dd>CSVs use commas, but some tools export semicolons or tabs. "Auto-detect" picks whichever symbol appears most in the first line — you can usually ignore this setting.</dd>
+    <dt>How large a file can it handle?</dt>
+    <dd>Pure in-memory frontend processing: smooth up to ~100k rows. Larger files are best split first.</dd>
+  </dl>
+
+  <footer>
+    © 2026 CSV Cleaner · Pure frontend, files never leave your browser ·
+    <a href="https://github.com/" rel="nofollow">Source / feedback</a>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let _BUF = null;
+let FNAME = "";
+let cleaned = "";
+
+function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+
+/* ---------- RFC4180 parse/serialize ---------- */
+function parseCSV(text, delim){
+  const rows=[]; let row=[]; let field=""; let inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else inQ=false; }
+      else field+=c;
+    }else{
+      if(c==='"') inQ=true;
+      else if(c===delim){ row.push(field); field=""; }
+      else if(c==="\n"){ row.push(field); field=""; rows.push(row); row=[]; }
+      else if(c==="\r"){ }
+      else field+=c;
+    }
+  }
+  if(field!=="" || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=>!(r.length===1 && r[0]===""));
+}
+function toCSV(rows, delim){
+  return rows.map(r=>r.map(cell=>{
+    const s=String(cell??"");
+    if(s.includes('"')||s.includes(delim)||/[\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }).join(delim)).join("\r\n");
+}
+function detectDelim(text){
+  const line = text.split(/\r?\n/,1)[0] || "";
+  const cand = [",",";","\t","|"];
+  let best=",",bestN=-1;
+  for(const c of cand){ const n=line.split(c).length-1; if(n>bestN){bestN=n;best=c;} }
+  return best;
+}
+function decodeBuf(){
+  const enc = $("enc").value;
+  if(enc === "auto"){
+    try{ return {text:new TextDecoder("utf-8",{fatal:true}).decode(_BUF), used:"UTF-8"}; }
+    catch(e){ return {text:new TextDecoder("gbk").decode(_BUF), used:"GBK"}; }
+  }
+  return {text:new TextDecoder(enc).decode(_BUF), used:enc.toUpperCase()};
+}
+
+/* ---------- file intake ---------- */
+function handleFile(f){
+  FNAME = f.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _BUF = e.target.result;
+    $("optCard").hidden = false;
+    $("prevCard").hidden = true;
+    $("dlBtn").hidden = true;
+    reparse();
+  };
+  reader.onerror = () => msg("Failed to read the file — please try again");
+  reader.readAsArrayBuffer(f);
+}
+function msg(s){ $("msg").textContent = s; }
+
+function reparse(){
+  try{
+    if(!_BUF){ msg("Choose a file first"); return; }
+    const {text, used} = decodeBuf();
+    let delim = $("delim").value;
+    if(delim === "\\t") delim = "\t";
+    if(delim === "auto") delim = detectDelim(text);
+
+    const rows = parseCSV(text, delim);
+    if(!rows.length){ msg("File is empty"); return; }
+    window._rows = rows; window._delim = delim;
+    showStats(rows, delim);
+    renderTable(rows.slice(0,50));
+    $("prevCard").hidden = true; $("dlBtn").hidden = true;
+    msg("Parsed: " + rows.length + " rows × " + (rows[0]?rows[0].length:0) + " cols" + (used!=="UTF-8"?" (encoding "+used+")":""));
+  }catch(e){
+    msg("Parse failed: " + e.message);
+  }
+}
+function showStats(a, delim){
+  const dupA = a.length - new Set(a.map(r=>r.join("\u0001"))).size;
+  const flat = a.flat();
+  const emptyCells = flat.filter(c=>String(c).trim()==="").length;
+  $("stats").innerHTML =
+    '<div class="stat"><b>'+a.length+'</b><span>rows</span></div>'+
+    '<div class="stat"><b>'+(a[0]?a[0].length:0)+'</b><span>cols</span></div>'+
+    '<div class="stat '+(dupA?"bad":"")+'"><b>'+dupA+'</b><span>duplicate rows</span></div>'+
+    '<div class="stat"><b>'+emptyCells+'</b><span>empty cells</span></div>'+
+    '<div class="stat"><b>'+esc(delim==="\t"?"Tab":delim)+'</b><span>delimiter</span></div>';
+}
+
+/* ---------- cleaning ---------- */
+function clean(){
+  const rows = window._rows; if(!rows) return;
+  let r = rows.map(row=>row.slice());
+  const header = $("header").value === "1";
+  const head = header ? r.shift() : null;
+
+  if($("opTrim").checked) r = r.map(row=>row.map(c=>String(c).trim()));
+  if($("opEmptyRow").checked) r = r.filter(row=>row.some(c=>String(c).trim()!==""));
+  if($("opDup").checked){
+    const seen = new Set(); const out=[];
+    for(const row of r){ const k=row.join("\u0001"); if(!seen.has(k)){seen.add(k);out.push(row);} }
+    r = out;
+  }
+  if($("opEmptyCol").checked){
+    const colCount = Math.max(...r.map(row=>row.length));
+    const dead = [];
+    for(let c=0;c<colCount;c++){ if(r.every(row=>String(row[c]??"").trim()==="")) dead.push(c); }
+    if(dead.length) r = r.map(row=>row.filter((_,c)=>!dead.includes(c)));
+  }
+  if(head) r.unshift(head);
+
+  cleaned = toCSV(r, window._delim || ",");
+  $("dlBtn").hidden = false;
+  const removed = rows.length - r.length;
+  $("diffTip").textContent = "Cleaned: " + rows.length + " rows → " + r.length + " rows" + (removed>0? " (removed " + removed + ")" : "");
+  const prev = r.slice(0, header?51:50);
+  renderTable(prev);
+  $("prevCard").hidden = false;
+  $("prevCard").scrollIntoView({behavior:"smooth"});
+}
+function renderTable(rows){
+  if(!rows.length){ $("tblbox").innerHTML = "<p style='padding:10px'>(empty)</p>"; return; }
+  const n = Math.max(...rows.map(r=>r.length));
+  let h = "<table><thead><tr>";
+  for(let c=0;c<n;c++) h += "<th>col "+(c+1)+"</th>";
+  h += "</tr></thead><tbody>";
+  for(const r of rows){
+    h += "<tr>";
+    for(let c=0;c<n;c++) h += "<td>"+esc(r[c]??"")+"</td>";
+    h += "</tr>";
+  }
+  $("tblbox").innerHTML = h + "</tbody></table>";
+}
+function downloadClean(){
+  if(!cleaned) return;
+  const blob = new Blob(["\ufeff"+cleaned], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  const base = FNAME.replace(/\.(csv|txt|tsv)$/i,"");
+  a.download = base + "_cleaned.csv";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- drop zone ---------- */
+const drop = $("drop");
+drop.onclick = () => $("file").click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = e => {
+  e.preventDefault(); drop.classList.remove("over");
+  const f = e.dataTransfer.files[0];
+  if(f) handleFile(f);
+};
+$("file").onchange = e => { const f = e.target.files[0]; if(f) handleFile(f); };
+$("file").onclick = e => e.stopPropagation();
+["delim","enc","header"].forEach(id => $(id).addEventListener("change", reparse));
+</script>
+</body>
+</html>

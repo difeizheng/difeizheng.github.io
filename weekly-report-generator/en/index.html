@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="google-site-verification" content="YbZyC8tnLwjXaT5WduW-xmKcjuYlAW49wBzRLLLR_do" />
+<meta name="google-site-verification" content="4dYRUWFhTPLt_8QpztnIVGH1mWiWA6UJEheHPlloxYs" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Report Generator — Free, Private, Boss-Readable in 30 Seconds</title>
+<meta name="description" content="Free online weekly report generator: turn messy work notes into a structured Progress / Risks / Asks report your manager can scan in 30 seconds. Runs 100% in your browser — nothing is uploaded.">
+<meta name="keywords" content="weekly report generator, status report template, work report maker, free weekly report">
+<link rel="canonical" href="./">
+<style>
+  :root{--bg:#1f2a44;--card:#26324f;--ink:#eef2fa;--sub:#9fb0d0;--accent:#ffd166;--accent2:#2ec4b6;--line:#3a4a6e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 16px}
+  h1{font-size:30px;margin:8px 0 4px}
+  h1 .mark{color:var(--accent)}
+  .sub{color:var(--sub);margin-bottom:20px}
+  h2{font-size:20px;margin:28px 0 12px;color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  label{display:block;font-size:14px;color:var(--sub);margin:10px 0 4px}
+  input,select,textarea{width:100%;background:#1a2338;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:15px/1.5 inherit}
+  textarea{resize:vertical}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .row>*{flex:1;min-width:120px}
+  .row .narrow{flex:0 0 120px}
+  .row .del{flex:0 0 44px;background:#3a2530;color:#ff9a9a;border:1px solid #5a3340;border-radius:8px;cursor:pointer}
+  button.primary{background:var(--accent);color:#1f2a44;font-weight:700;border:0;border-radius:10px;padding:12px 22px;font-size:17px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent2);border:1px solid var(--accent2);border-radius:10px;padding:10px 18px;cursor:pointer}
+  .tasks .row{margin-bottom:8px}
+  #out{min-height:280px;white-space:pre-wrap;font-family:Consolas,Menlo,monospace;font-size:14px}
+  .tip{color:var(--sub);font-size:13px;margin-top:6px}
+  .faq dt{color:var(--accent);margin-top:14px;font-weight:700}
+  .faq dd{color:var(--sub)}
+  .pro{border:1px dashed var(--accent);border-radius:12px;padding:16px;margin:16px 0}
+  footer{color:var(--sub);font-size:13px;margin-top:32px;border-top:1px solid var(--line);padding-top:14px}
+  a{color:var(--accent2)}
+  .lang{position:absolute;top:14px;right:16px}
+  .lang a{color:var(--sub);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang"><a href="../">中文 →</a></div>
+  <h1>Weekly Report <span class="mark">Generator</span></h1>
+  <p class="sub">Turn messy work notes into a structured <b>Progress / Risks / Asks</b> report. Runs 100% in your browser — <b>nothing is uploaded</b>.</p>
+
+  <div class="card">
+    <div class="row">
+      <div><label>Your name (optional)</label><input id="name" placeholder="Jane Doe"></div>
+      <div><label>Period</label><input id="period" placeholder="Oct 27 – Oct 31"></div>
+      <div class="narrow"><label>Template</label>
+        <select id="tpl">
+          <option value="std">Standard (4 sections)</option>
+          <option value="mini">Minimal (3 lines)</option>
+        </select>
+      </div>
+    </div>
+
+    <label>This week's work items — one per line: Task | Status | % | Note</label>
+    <div class="tip">Statuses: Done / In progress / Blocked / Planned. Anything "Blocked" is routed to the Risks section automatically.</div>
+    <div id="tasks" class="tasks"></div>
+    <button class="ghost" onclick="addRow()">＋ Add item</button>
+
+    <label>Next week's plan (one per line, optional)</label>
+    <textarea id="nextweek" rows="3" placeholder="Finish integration testing&#10;Draft phase-2 proposal"></textarea>
+
+    <label>Support needed / decisions required (one per line, optional)</label>
+    <textarea id="support" rows="2" placeholder="Need backend to confirm API fields by Wednesday"></textarea>
+
+    <p style="margin-top:14px"><button class="primary" onclick="gen()">Generate report</button></p>
+  </div>
+
+  <div class="card" id="resultCard" hidden>
+    <label>Result (copy or download)</label>
+    <textarea id="out"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="ghost" onclick="copyOut()">Copy all</button>
+      <button class="ghost" onclick="downloadOut()">Download .md</button>
+    </div>
+    <p class="tip" id="copyTip"></p>
+  </div>
+
+  <div class="pro">
+    <b style="color:var(--accent)">Pro pack (coming soon)</b>
+    <p class="tip">Advanced templates: promotion review, monthly rollup, executive summary. Everything on this page stays free forever.</p>
+    <!-- Lemon Squeezy checkout link goes here:
+         <a class="primary" href="YOUR_LS_PRODUCT_URL">Get the Pro pack</a> -->
+  </div>
+
+  <h2>How it works — 3 steps</h2>
+  <div class="card">
+    <p><b>1. Dump fragments.</b> Throw this week's work in, one item per line. Order and wording don't matter.</p>
+    <p><b>2. Tag status.</b> Mark each item Done / In progress / Blocked. Blocked items are auto-routed to Risks — surfacing a problem in a report is an early warning; surfacing it at a missed deadline is an incident.</p>
+    <p><b>3. Generate and verify.</b> The tool only restructures what you enter — <b>it invents nothing</b>. Spend one minute checking the numbers before sending.</p>
+  </div>
+
+  <h2>Why "Progress / Risks / Asks"</h2>
+  <div class="card">
+    <p>Your manager isn't reading to learn what you did — they're scanning for: where things stand, what's stuck, and what needs their decision. This structure orders information by decision value so a 30-second scan captures everything.</p>
+    <p style="margin-top:8px">If you can't fill those sections, it's usually not a writing problem — it's an unprocessed week. That's why this tool starts from raw fragments and lets structure do the sorting.</p>
+  </div>
+
+  <h2>FAQ</h2>
+  <dl class="faq card">
+    <dt>Is my content uploaded anywhere?</dt>
+    <dd>No. This is a pure frontend page. Everything you type stays in your browser (localStorage draft) and auto-restores on your next visit.</dd>
+    <dt>How is this different from asking an AI chatbot?</dt>
+    <dd>AI chatbots send your content to a third party. This tool works offline with zero leakage — sensible for sensitive work content. They also combine well: structure here first, polish with AI second.</dd>
+    <dt>What happens to "Blocked" items?</dt>
+    <dd>They move to "Risks & Blockers" with your note attached. Proactively surfacing problems in a report is the cheapest credibility move there is.</dd>
+    <dt>Is it free?</dt>
+    <dd>Every feature on this page is free forever. Optional paid template packs may be added later — never required.</dd>
+  </dl>
+
+  <footer>
+    © 2026 Weekly Report Generator · Pure frontend, data never leaves your browser ·
+    <a href="https://github.com/" rel="nofollow">Source / feedback</a>
+  </footer>
+</div>
+
+<script>
+const STATUSES = ["Done","In progress","Blocked","Planned"];
+const $ = id => document.getElementById(id);
+
+function addRow(t={name:"",status:"In progress",pct:"",note:""}){
+  const div = document.createElement("div");
+  div.className = "row";
+  div.innerHTML =
+    '<input class="t-name" placeholder="Task, e.g. supplier reconciliation module" value="'+esc(t.name)+'">'+
+    '<select class="t-status narrow">'+STATUSES.map(s=>'<option'+(s===t.status?' selected':'')+'>'+s+'</option>').join("")+'</select>'+
+    '<input class="t-pct narrow" type="number" min="0" max="100" placeholder="%" value="'+esc(t.pct)+'">'+
+    '<input class="t-note" placeholder="Note: status change / blocker / next step" value="'+esc(t.note)+'">'+
+    '<button class="del" onclick="this.parentNode.remove()">×</button>';
+  $("tasks").appendChild(div);
+  save();
+}
+function esc(s){return String(s??"").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+function rows(){
+  return [...document.querySelectorAll("#tasks .row")].map(r=>({
+    name: r.querySelector(".t-name").value.trim(),
+    status: r.querySelector(".t-status").value,
+    pct: r.querySelector(".t-pct").value.trim(),
+    note: r.querySelector(".t-note").value.trim()
+  })).filter(t=>t.name);
+}
+function lines(id){return $(id).value.split("\n").map(s=>s.trim()).filter(Boolean);}
+
+function gen(){
+  const ts = rows();
+  if(!ts.length){alert("Add at least one task first");return;}
+  const tpl = $("tpl").value;
+  const period = $("period").value.trim() || "This week";
+  const name = $("name").value.trim();
+  const head = (tpl==="std" ? "WEEKLY REPORT — "+period+(name?" — "+name:"") : "QUICK REPORT — "+period+(name?" — "+name:""));
+
+  const done = ts.filter(t=>t.status==="Done");
+  const doing = ts.filter(t=>t.status==="In progress");
+  const risk = ts.filter(t=>t.status==="Blocked");
+  const plan = ts.filter(t=>t.status==="Planned");
+
+  const progLine = t=>{
+    let s = "";
+    if(t.status==="Done") s = t.name + ": done";
+    else s = t.name + ": " + (t.pct? t.pct+"% complete":"in progress") + (t.note? " — "+t.note : "");
+    return "- " + s;
+  };
+
+  let out = "";
+  if(tpl==="std"){
+    out += head + "\n\n1) Progress\n";
+    const L = [...done,...doing].map(progLine);
+    out += (L.length? L.join("\n") : "- (add tasks above)") + "\n\n";
+    out += "2) Risks & Blockers\n";
+    out += (risk.length? risk.map(t=>"- "+t.name+(t.note? ": "+t.note : "")).join("\n") : "- None") + "\n\n";
+    out += "3) Support needed / decisions required\n";
+    const sup = lines("support");
+    out += (sup.length? sup.map(s=>"- "+s).join("\n") : "- None") + "\n\n";
+    out += "4) Next week\n";
+    const nw = [...lines("nextweek"), ...plan.map(t=>t.name)];
+    out += (nw.length? nw.map(s=>"- "+s).join("\n") : "- (add next week's plan)") + "\n";
+  }else{
+    const main = (done[0]||doing[0]);
+    out += head + "\n";
+    out += "1. Progress: " + (main? main.name + (main.pct? " ("+main.pct+"%)":"") + (main.note? " — "+main.note : "") : "__") + "\n";
+    out += "2. Next: " + (lines("nextweek")[0] || (plan[0]? plan[0].name : "__")) + "\n";
+    out += "3. Need: " + (lines("support")[0] || (risk[0]? "Watch: "+risk[0].name : "Nothing")) + "\n";
+  }
+  $("out").value = out;
+  $("resultCard").hidden = false;
+  $("resultCard").scrollIntoView({behavior:"smooth"});
+}
+
+function copyOut(){
+  const v = $("out").value;
+  const ok = ()=>{ $("copyTip").textContent = "Copied ✓"; setTimeout(()=>$("copyTip").textContent="",2000); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(v).then(ok).catch(()=>fallbackCopy(v,ok));
+  }else fallbackCopy(v,ok);
+}
+function fallbackCopy(v,ok){
+  const ta = document.createElement("textarea");
+  ta.value = v; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); ok(); }catch(e){ alert("Copy failed — please select and copy manually"); }
+  document.body.removeChild(ta);
+}
+function downloadOut(){
+  const blob = new Blob([$("out").value], {type:"text/markdown;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "weekly-report_"+($("period").value.trim()||Date.now())+".md";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function save(){
+  const data = {
+    name:$("name").value, period:$("period").value, tpl:$("tpl").value,
+    tasks: rows(), nextweek:$("nextweek").value, support:$("support").value
+  };
+  try{ localStorage.setItem("wrg_draft_en", JSON.stringify(data)); }catch(e){}
+}
+function load(){
+  try{
+    const d = JSON.parse(localStorage.getItem("wrg_draft_en")||"null");
+    if(!d) return false;
+    $("name").value = d.name||""; $("period").value = d.period||"";
+    $("tpl").value = d.tpl||"std"; $("nextweek").value = d.nextweek||""; $("support").value = d.support||"";
+    (d.tasks&&d.tasks.length? d.tasks : [{}]).forEach(t=>addRow(t));
+    return true;
+  }catch(e){ return false; }
+}
+document.addEventListener("input", save);
+document.addEventListener("change", save);
+if(!load()){ addRow(); addRow(); }
+</script>
+</body>
+</html>

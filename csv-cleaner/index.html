@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="google-site-verification" content="YbZyC8tnLwjXaT5WduW-xmKcjuYlAW49wBzRLLLR_do" />
+<meta name="google-site-verification" content="4dYRUWFhTPLt_8QpztnIVGH1mWiWA6UJEheHPlloxYs" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSV 清理器 - 免费在线去重/去空行/格式化，文件不上传 | csv-cleaner</title>
+<meta name="description" content="免费在线 CSV 清理工具：拖入文件即可去重复行、删空行空列、去首尾空格，支持 GBK/UTF-8 编码自动识别，支持逗号/分号/Tab 分隔。全程本地处理，文件不出浏览器。">
+<meta name="keywords" content="csv清理,csv去重,csv在线处理,csv转utf-8,免费csv工具">
+<link rel="canonical" href="./">
+<style>
+  :root{--bg:#1f2a44;--card:#26324f;--ink:#eef2fa;--sub:#9fb0d0;--accent:#ffd166;--accent2:#2ec4b6;--line:#3a4a6e;--bad:#ff9a9a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.7 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px}
+  h1{font-size:30px;margin:8px 0 4px}
+  h1 .mark{color:var(--accent)}
+  .sub{color:var(--sub);margin-bottom:20px}
+  h2{font-size:20px;margin:28px 0 12px;color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--sub);cursor:pointer;transition:.2s}
+  .drop.over{border-color:var(--accent);color:var(--accent)}
+  label{display:block;font-size:14px;color:var(--sub);margin:10px 0 4px}
+  select,input{background:#1a2338;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:15px/1.5 inherit}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row label{margin:0}
+  button.primary{background:var(--accent);color:#1f2a44;font-weight:700;border:0;border-radius:10px;padding:12px 22px;font-size:17px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent2);border:1px solid var(--accent2);border-radius:10px;padding:10px 18px;cursor:pointer}
+  .stats{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+  .stat{background:#1a2338;border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:110px;text-align:center}
+  .stat b{display:block;font-size:22px;color:var(--accent)}
+  .stat span{font-size:12px;color:var(--sub)}
+  .stat.bad b{color:var(--bad)}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-top:10px}
+  th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  th{background:#1a2338;color:var(--accent);position:sticky;top:0}
+  .tblbox{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+  .tip{color:var(--sub);font-size:13px;margin-top:6px}
+  .faq dt{color:var(--accent);margin-top:14px;font-weight:700}
+  .faq dd{color:var(--sub)}
+  .pro{border:1px dashed var(--accent);border-radius:12px;padding:16px;margin:16px 0}
+  .ops{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+  .ops label{display:flex;gap:6px;align-items:center;background:#1a2338;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--ink);font-size:14px}
+  .ops input{width:auto}
+  footer{color:var(--sub);font-size:13px;margin-top:32px;border-top:1px solid var(--line);padding-top:14px}
+  a{color:var(--accent2)}
+  .lang{position:absolute;top:14px;right:16px}
+  .lang a{color:var(--sub);text-decoration:none}
+  #msg{color:var(--bad);font-size:14px;margin-top:8px;min-height:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang"><a href="en/">English →</a></div>
+  <h1>CSV <span class="mark">清理器</span></h1>
+  <p class="sub">拖入文件即可去重复行、删空行空列、去首尾空格。全程<b>本地处理，文件不出浏览器</b>。自动识别 GBK / UTF-8 编码与分隔符。</p>
+
+  <div class="drop" id="drop">
+    <b>把 CSV 文件拖到这里</b><br>或点击选择文件（处理在本地完成，5MB 内秒开）
+    <input type="file" id="file" accept=".csv,.txt,.tsv" hidden>
+  </div>
+  <div id="msg"></div>
+
+  <div class="card" id="optCard" hidden>
+    <div class="row">
+      <div><label>分隔符</label>
+        <select id="delim">
+          <option value="auto">自动识别</option>
+          <option value=",">逗号 ,</option>
+          <option value=";">分号 ;</option>
+          <option value="\t">Tab</option>
+        </select>
+      </div>
+      <div><label>文件编码</label>
+        <select id="enc">
+          <option value="auto">自动（UTF-8 → GBK）</option>
+          <option value="utf-8">UTF-8</option>
+          <option value="gbk">GBK / GB18030</option>
+        </select>
+      </div>
+      <div><label>首行</label>
+        <select id="header">
+          <option value="1">第一行是表头</option>
+          <option value="0">没有表头</option>
+        </select>
+      </div>
+      <div style="flex:0"><label>&nbsp;</label><button class="ghost" onclick="reparse()">重新解析</button></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <label>清理动作</label>
+    <div class="ops">
+      <label><input type="checkbox" id="opDup" checked> 去除重复行</label>
+      <label><input type="checkbox" id="opEmptyRow" checked> 删除全空行</label>
+      <label><input type="checkbox" id="opEmptyCol"> 删除全空列</label>
+      <label><input type="checkbox" id="opTrim" checked> 去除首尾空格</label>
+      <label><input type="checkbox" id="opCrlf" checked> 统一换行与引号</label>
+    </div>
+
+    <p style="margin-top:10px">
+      <button class="primary" onclick="clean()">清 理 并 预 览</button>
+      <button class="ghost" onclick="downloadClean()" id="dlBtn" hidden>下载清理后的 CSV</button>
+    </p>
+    <p class="tip" id="diffTip"></p>
+  </div>
+
+  <div class="card" id="prevCard" hidden>
+    <label>清理后预览（最多显示前 50 行，下载的是完整文件）</label>
+    <div class="tblbox" id="tblbox"></div>
+  </div>
+
+  <div class="pro">
+    <b style="color:var(--accent)">Pro 版（即将上线）</b>
+    <p class="tip">批量多文件处理、按列去重、正则替换、Excel 直接导出。本页全部功能永久免费。</p>
+    <!-- Lemon Squeezy checkout:
+         <a class="primary" href="YOUR_LS_PRODUCT_URL">获取 Pro 批量版</a> -->
+  </div>
+
+  <h2>为什么用本地清理器而不是 Excel</h2>
+  <div class="card">
+    <p>三件事 Excel 不顺手：①几十万行的去重会卡死，本工具瞬间完成；②中文 CSV 打开乱码（GBK/UTF-8 之争），本工具自动识别；③把数据传给在线工具不放心——本工具<b>根本不上传</b>，断网也能用。</p>
+  </div>
+
+  <h2>常见问题</h2>
+  <dl class="faq card">
+    <dt>文件会被上传吗？</dt>
+    <dd>不会。用浏览器内置的 FileReader 读取，所有处理都在你的设备内存里完成，断网可用。</dd>
+    <dt>打开是乱码怎么办？</dt>
+    <dd>大概率是 GBK 编码的文件被按 UTF-8 读了。编码选「自动」或手动选 GBK，点「重新解析」即可。</dd>
+    <dt>分隔符是什么？</dt>
+    <dd>CSV 用逗号，但Excel 中文版常导出分号或 Tab。选「自动识别」会按第一行中出现最多的符号判断，一般不用管。</dd>
+    <dt>多大文件能处理？</dt>
+    <dd>纯前端内存处理，10 万行以内体验流畅；更大的文件建议拆分后处理。</dd>
+  </dl>
+
+  <footer>
+    © 2026 CSV 清理器 · 纯前端工具，文件不出浏览器 ·
+    <a href="https://github.com/" rel="nofollow">源码 / 反馈</a>
+  <div class="sister-links" style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:13px;color:var(--sub)">姊妹工具：<a href="/" style="color:var(--accent2)">工具箱首页</a> · <a href="/weekly-report-generator/" style="color:var(--accent2)">周报生成器</a> · <a href="/resume-jd-matcher/" style="color:var(--accent2)">简历JD匹配器</a> · <a href="/prompt-builder/" style="color:var(--accent2)">提示词生成器</a> · <a href="/md-converter/" style="color:var(--accent2)">MD转换器</a></div>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let _BUF = null;   // 原始文件（ArrayBuffer，按所选编码延迟解码）
+let FNAME = "";
+let cleaned = "";  // 清理结果
+
+function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+
+/* ---------- RFC4180 解析/导出 ---------- */
+function parseCSV(text, delim){
+  const rows=[]; let row=[]; let field=""; let inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else inQ=false; }
+      else field+=c;
+    }else{
+      if(c==='"') inQ=true;
+      else if(c===delim){ row.push(field); field=""; }
+      else if(c==="\n"){ row.push(field); field=""; rows.push(row); row=[]; }
+      else if(c==="\r"){ }
+      else field+=c;
+    }
+  }
+  if(field!=="" || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=>!(r.length===1 && r[0]===""));
+}
+function toCSV(rows, delim){
+  return rows.map(r=>r.map(cell=>{
+    const s=String(cell??"");
+    if(s.includes('"')||s.includes(delim)||/[\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }).join(delim)).join("\r\n");
+}
+function detectDelim(text){
+  const line = text.split(/\r?\n/,1)[0] || "";
+  const cand = [",",";","\t","|"];
+  let best=",",bestN=-1;
+  for(const c of cand){ const n=line.split(c).length-1; if(n>bestN){bestN=n;best=c;} }
+  return best;
+}
+function decode(buf, enc){
+  if(enc==="auto"){
+    try{ return {text:new TextDecoder("utf-8",{fatal:true}).decode(buf), used:"UTF-8"}; }
+    catch(e){ return {text:new TextDecoder("gbk").decode(buf), used:"GBK"}; }
+  }
+  return {text:new TextDecoder(enc).decode(buf), used:enc.toUpperCase()};
+}
+
+/* ---------- 文件读入 ---------- */
+function handleFile(f){
+  FNAME = f.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _BUF = e.target.result;
+    $("optCard").hidden = false;
+    $("prevCard").hidden = true;
+    $("dlBtn").hidden = true;
+    reparse();
+  };
+  reader.onerror = () => msg("读取失败，请重试");
+  reader.readAsArrayBuffer(f);
+}
+function msg(s){ $("msg").textContent = s; }
+
+function decodeBuf(){
+  const enc = $("enc").value;
+  if(enc === "auto"){
+    try{ return {text:new TextDecoder("utf-8",{fatal:true}).decode(_BUF), used:"UTF-8"}; }
+    catch(e){ return {text:new TextDecoder("gbk").decode(_BUF), used:"GBK"}; }
+  }
+  return {text:new TextDecoder(enc).decode(_BUF), used:enc.toUpperCase()};
+}
+function reparse(){
+  try{
+    if(!_BUF){ msg("请先选择文件"); return; }
+    const {text, used} = decodeBuf();
+    let delim = $("delim").value;
+    if(delim === "\\t") delim = "\t";
+    if(delim === "auto") delim = detectDelim(text);
+
+    const rows = parseCSV(text, delim);
+    if(!rows.length){ msg("文件为空"); return; }
+    window._rows = rows; window._delim = delim;
+    showStats(rows, delim);
+    renderTable(rows.slice(0,50));
+    $("prevCard").hidden = true; $("dlBtn").hidden = true;
+    msg("解析成功：" + rows.length + " 行 × " + (rows[0]?rows[0].length:0) + " 列" + (used!=="UTF-8"?"（编码 "+used+"）":""));
+  }catch(e){
+    msg("解析失败：" + e.message);
+  }
+}
+function showStats(a, delim){
+  const dupA = a.length - new Set(a.map(r=>r.join("\u0001"))).size;
+  const flat = a.flat();
+  const emptyCells = flat.filter(c=>String(c).trim()==="").length;
+  $("stats").innerHTML =
+    '<div class="stat"><b>'+a.length+'</b><span>总行数</span></div>'+
+    '<div class="stat"><b>'+(a[0]?a[0].length:0)+'</b><span>列数</span></div>'+
+    '<div class="stat '+(dupA?"bad":"")+'"><b>'+dupA+'</b><span>重复行</span></div>'+
+    '<div class="stat"><b>'+emptyCells+'</b><span>空单元格</span></div>'+
+    '<div class="stat"><b>'+esc(delim==="\t"?"Tab":delim)+'</b><span>分隔符</span></div>';
+}
+
+/* ---------- 清理 ---------- */
+function clean(){
+  const rows = window._rows; if(!rows) return;
+  let r = rows.map(row=>row.slice());
+  const header = $("header").value === "1";
+  const head = header ? r.shift() : null;
+
+  if($("opTrim").checked) r = r.map(row=>row.map(c=>String(c).trim()));
+  if($("opEmptyRow").checked) r = r.filter(row=>row.some(c=>String(c).trim()!==""));
+  if($("opDup").checked){
+    const seen = new Set(); const out=[];
+    for(const row of r){ const k=row.join("\u0001"); if(!seen.has(k)){seen.add(k);out.push(row);} }
+    r = out;
+  }
+  if($("opEmptyCol").checked){
+    const colCount = Math.max(...r.map(row=>row.length));
+    const dead = [];
+    for(let c=0;c<colCount;c++){ if(r.every(row=>String(row[c]??"").trim()==="")) dead.push(c); }
+    if(dead.length) r = r.map(row=>row.filter((_,c)=>!dead.includes(c)));
+  }
+  if(head) r.unshift(head);
+
+  cleaned = toCSV(r, window._delim || ",");
+  $("dlBtn").hidden = false;
+  const removed = rows.length - r.length;
+  $("diffTip").textContent = "清理完成：" + rows.length + " 行 → " + r.length + " 行" + (removed>0? "（移除 " + removed + " 行）" : "");
+  const prev = r.slice(0, header?51:50);
+  renderTable(prev);
+  $("prevCard").hidden = false;
+  $("prevCard").scrollIntoView({behavior:"smooth"});
+}
+function renderTable(rows){
+  if(!rows.length){ $("tblbox").innerHTML = "<p style='padding:10px'>（空）</p>"; return; }
+  const n = Math.max(...rows.map(r=>r.length));
+  let h = "<table><thead><tr>";
+  for(let c=0;c<n;c++) h += "<th>列"+(c+1)+"</th>";
+  h += "</tr></thead><tbody>";
+  for(const r of rows){
+    h += "<tr>";
+    for(let c=0;c<n;c++) h += "<td>"+esc(r[c]??"")+"</td>";
+    h += "</tr>";
+  }
+  $("tblbox").innerHTML = h + "</tbody></table>";
+}
+function downloadClean(){
+  if(!cleaned) return;
+  const blob = new Blob(["\ufeff"+cleaned], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  const base = FNAME.replace(/\.(csv|txt|tsv)$/i,"");
+  a.download = base + "_cleaned.csv";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- 拖放与选择 ---------- */
+const drop = $("drop");
+drop.onclick = () => $("file").click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = e => {
+  e.preventDefault(); drop.classList.remove("over");
+  const f = e.dataTransfer.files[0];
+  if(f) handleFile(f);
+};
+$("file").onchange = e => { const f = e.target.files[0]; if(f) handleFile(f); };
+$("file").onclick = e => e.stopPropagation();
+["delim","enc","header"].forEach(id => $(id).addEventListener("change", reparse));
+</script>
+</body>
+</html>

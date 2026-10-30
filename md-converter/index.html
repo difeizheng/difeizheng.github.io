@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="google-site-verification" content="YbZyC8tnLwjXaT5WduW-xmKcjuYlAW49wBzRLLLR_do" />
+<meta name="google-site-verification" content="4dYRUWFhTPLt_8QpztnIVGH1mWiWA6UJEheHPlloxYs" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markdown 平台转换器 - 一键生成头条号/知乎/公众号三平台版本</title>
+<meta name="description" content="免费在线 Markdown 转换器：粘贴一篇文章，一键生成头条号/知乎/公众号三平台适配版本——头条自动短段落+话题标签，知乎结论前置，公众号自动阅读时长+行动清单。纯本地处理，内容不出浏览器。">
+<meta name="keywords" content="markdown转换,头条号排版,公众号排版,知乎格式化,一稿多发,免费排版工具">
+<link rel="canonical" href="./">
+<style>
+  :root{--bg:#1f2a44;--card:#26324f;--ink:#eef2fa;--sub:#9fb0d0;--accent:#ffd166;--accent2:#2ec4b6;--line:#3a4a6e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.7 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px}
+  h1{font-size:30px;margin:8px 0 4px}
+  h1 .mark{color:var(--accent)}
+  .sub{color:var(--sub);margin-bottom:20px}
+  h2{font-size:20px;margin:28px 0 12px;color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  label{display:block;font-size:14px;color:var(--sub);margin:10px 0 4px}
+  textarea{width:100%;background:#1a2338;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font:15px/1.5 inherit;resize:vertical}
+  button.primary{background:var(--accent);color:#1f2a44;font-weight:700;border:0;border-radius:10px;padding:12px 22px;font-size:17px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent2);border:1px solid var(--accent2);border-radius:10px;padding:9px 16px;cursor:pointer;font-size:14px}
+  .tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .tab{background:#1a2338;border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px}
+  .tab.on{color:var(--accent);border-color:var(--accent)}
+  #out{min-height:340px;white-space:pre-wrap;font-family:Consolas,Menlo,monospace;font-size:14px}
+  .tip{color:var(--sub);font-size:13px;margin-top:6px}
+  .faq dt{color:var(--accent);margin-top:14px;font-weight:700}
+  .faq dd{color:var(--sub)}
+  .pro{border:1px dashed var(--accent);border-radius:12px;padding:16px;margin:16px 0}
+  footer{color:var(--sub);font-size:13px;margin-top:32px;border-top:1px solid var(--line);padding-top:14px}
+  a{color:var(--accent2)}
+  #msg{color:var(--bad);font-size:14px;min-height:20px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Markdown <span class="mark">平台转换器</span></h1>
+  <p class="sub">粘贴一篇 Markdown 文章，一键生成<b>头条号 / 知乎 / 公众号</b>三平台适配版本。纯本地处理，内容不出浏览器。规则确定性转换，不联网、不调用 AI。</p>
+
+  <div class="card">
+    <label>粘贴你的 Markdown 文章（首行用 `# 标题`，可选 `> 键: 值` 元数据行会被自动剥离）</label>
+    <textarea id="input" rows="14" placeholder="# 我的文章标题&#10;&#10;## 第一节&#10;&#10;这里写正文……&#10;&#10;- 要点一&#10;- 要点二"></textarea>
+    <p style="margin-top:12px"><button class="primary" onclick="convertAll()">转 换 三 平 台</button></p>
+    <p id="msg"></p>
+  </div>
+
+  <div class="card" id="resultCard" hidden>
+    <div class="tabs">
+      <span class="tab on" data-p="toutiao">头条号版</span>
+      <span class="tab" data-p="zhihu">知乎版</span>
+      <span class="tab" data-p="gzh">公众号版</span>
+    </div>
+    <textarea id="out"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="ghost" onclick="copyOut()">复制当前平台版</button>
+      <button class="ghost" onclick="downloadOut()">下载当前版 (.md)</button>
+      <button class="ghost" onclick="downloadAll()">下载全部三版</button>
+    </div>
+    <p class="tip" id="copyTip"></p>
+  </div>
+
+  <div class="pro">
+    <b style="color:var(--accent)">命令行版（开源，功能更全）</b>
+    <p class="tip">本页是 md2posts 命令行工具的网页精简版。CLI 版支持批量目录转换、代码块保护、表格转换，仓库见 GitHub（搜索 md2posts）。</p>
+  </div>
+
+  <h2>三个版本各做了什么（转换规则公开）</h2>
+  <div class="card">
+    <p><b>头条号版</b>：生成 3 个标题备选；段落按句子切到 100 字内；小节标题加 ▍ 标记；剥离 Markdown 语法；按关键词生成话题标签。</p>
+    <p style="margin-top:8px"><b>知乎版</b>：保留标题层级与论证结构；结论前置（首段第一句加粗为「先说结论」）。</p>
+    <p style="margin-top:8px"><b>公众号版</b>：顶部显示估算阅读时长；标题转粗体；正文中的清单项自动汇总成文末「今日行动清单」；— END — 收尾。</p>
+    <p class="tip">全部为确定性规则转换：<b>不联网、不调用 AI、不改写你的内容</b>。</p>
+  </div>
+
+  <h2>常见问题</h2>
+  <dl class="faq card">
+    <dt>内容会被上传吗？</dt>
+    <dd>不会。全部转换在你的浏览器内完成，断网可用，页面关闭即消失。</dd>
+    <dt>转换后还需要人工做什么？</dt>
+    <dd>三件事：①头条版从 3 个标题备选里挑一个；②通读一遍确认语义没有被段落切分破坏；③配图（本工具不处理图片）。</dd>
+    <dt>支持哪些 Markdown 语法？</dt>
+    <dd>标题（#/##/###）、粗体、列表、引用、分隔线、表格。代码块会原样保留。图片语法暂不处理（v2 计划）。</dd>
+  </dl>
+
+  <footer>
+    © 2026 Markdown 平台转换器 · md2posts 网页版 · 纯前端工具，内容不出浏览器 ·
+    <a href="https://github.com/" rel="nofollow">CLI 版源码</a>
+  <div class="sister-links" style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:13px;color:var(--sub)">姊妹工具：<a href="/" style="color:var(--accent2)">工具箱首页</a> · <a href="/weekly-report-generator/" style="color:var(--accent2)">周报生成器</a> · <a href="/csv-cleaner/" style="color:var(--accent2)">CSV清理器</a> · <a href="/resume-jd-matcher/" style="color:var(--accent2)">简历JD匹配器</a> · <a href="/prompt-builder/" style="color:var(--accent2)">提示词生成器</a></div>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const META_KEYS = ["选题","平台包装","发布建议","标题","title"];
+const META_RE = /^>\s*([^:：]{1,12})\s*[:：]\s*(.+)$/;
+const HEADER_RE = /^#{1,3}\s+/;
+const LIST_ITEM_RE = /^\s*(?:[-*]|\d+[.、])\s+(.+)/;
+const SENT_SPLIT_RE = /(?<=[。！？!?；;])/;
+const STOP = new Set("一个 我们 你们 他们 自己 什么 这个 那个 可以 就是 不是 还是 没有 因为 所以 但是 如果 现在 时间 问题 方法 内容 已经 之后 然后 通过 进行 以及 对于 让 你 我 他 它 都 也 就 很 更 最 会 能 要 有 是 在 和 与 或 的 了 吗 呢 吧 啊 呀 这 那 就 都".split(""));
+
+let CURRENT = {toutiao:"", zhihu:"", gzh:""};
+let ACTIVE = "toutiao";
+
+/* ---------- 基础解析 ---------- */
+function stripComments(t){ return t.replace(/<!--[\s\S]*?-->/g, ""); }
+function parseMeta(text){
+  const meta = {}; const kept = [];
+  for(const line of text.split("\n")){
+    const m = line.trim().match(META_RE);
+    if(m && META_KEYS.includes(m[1].trim())) meta[m[1].trim()] = m[2].trim();
+    else kept.push(line);
+  }
+  return [meta, kept.join("\n")];
+}
+function extractTitle(body){
+  const m = body.match(/^#\s+(.+)$/m);
+  if(!m) return ["", body];
+  return [m[1].trim(), (body.slice(0,m.index) + body.slice(m.index+m[0].length)).replace(/^\n+/,"")];
+}
+function dropRules(t){ return t.replace(/^---\s*$/gm, ""); }
+function cleanText(s){ return s.replace(/\*\*(.+?)\*\*/g,"$1").replace(/`/g,""); }
+function splitPara(t, maxLen){
+  if(t.length <= maxLen) return [t];
+  const parts = t.split(SENT_SPLIT_RE).filter(Boolean);
+  const chunks = []; let cur = "";
+  for(const s of parts){
+    if(cur && (cur + s).length > maxLen){ chunks.push(cur); cur = s.replace(/^\s+/,""); }
+    else cur += s;
+  }
+  if(cur) chunks.push(cur);
+  return chunks;
+}
+function stashCode(body){
+  const lines = body.split("\n"); const stash = []; const out = []; let inCode = false;
+  for(const line of lines){
+    if(/^```/.test(line.trim())){
+      if(!inCode){ inCode = true; stash.push([]); out.push("@@CODE"+(stash.length-1)+"@@"); }
+      else inCode = false;
+      continue;
+    }
+    if(inCode) stash[stash.length-1].push(line); else out.push(line);
+  }
+  return [out.join("\n"), stash.map(b=>b.join("\n"))];
+}
+function restoreCode(text, stash, style){
+  stash.forEach((code,i)=>{
+    const token = "@@CODE"+i+"@@";
+    if(style==="toutiao"){
+      text = text.replace(token, "▍代码\n" + code.split("\n").map(l=>"　"+l).join("\n"));
+    } else {
+      text = text.replace(token, "```\n"+code+"\n```");
+    }
+  });
+  return text;
+}
+function readMinutes(t){ return Math.max(1, Math.round(t.replace(/[#>*`\-\s]/g,"").length / 400)); }
+
+/* ---------- 关键词（中文n-gram） ---------- */
+function keywords(text, n){
+  const t = text.replace(/\*\*(.+?)\*\*/g,"$1").replace(/[\s#>*\-\d\W_]+/g,"");
+  const freq = {};
+  for(const size of [3,2,4]){
+    for(let i=0;i+size<=t.length;i++){
+      const g = t.substr(i,size);
+      if(STOP.has(g) || new Set(g).size===1) continue;
+      freq[g] = (freq[g]||0)+1;
+    }
+  }
+  const picked = [];
+  for(const g of Object.keys(freq).sort((a,b)=>freq[b]-freq[a])){
+    if(picked.length>=n) break;
+    if(!picked.some(p=>p.includes(g))) picked.push(g);
+  }
+  return picked;
+}
+
+/* ---------- 平台打包 ---------- */
+function titleVariants(title){
+  const v = [title];
+  if(title){
+    if(!/一文|讲清/.test(title)) v.push("一文讲清："+title);
+    if(!/附/.test(title)) v.push(title+"，附可直接抄的做法");
+  }
+  return v;
+}
+function packToutiao(body, title){
+  const out = []; const kws = keywords(body, 5);
+  out.push("【标题备选（人工挑选一个）】");
+  titleVariants(title).forEach((t,i)=>out.push((i+1)+". "+t));
+  out.push("", "——以下为正文——", "");
+  for(const block of dropRules(body).split("\n\n")){
+    const b = block.trim(); if(!b) continue;
+    const lines = b.split("\n");
+    if(lines.every(l=>!l.trim() || /^#/.test(l.trim()))){
+      out.push("▍"+cleanText(lines[0].replace(/^#+\s*/,"").trim()), "");
+      continue;
+    }
+    if(lines.every(l=>!l.trim() || /^\|/.test(l.trim()))){
+      const nonEmpty = lines.filter(l=>l.trim());
+      const rows = nonEmpty
+        .map(l=>l.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim()).join("｜"))
+        .filter((row,i)=>!(i===1 && /^[-:\s｜]+$/.test(nonEmpty[1]))); // 第2行是分隔线则剔除
+      if(rows.length){ out.push("▍表格", "（列："+rows[0]+"）", "", ...rows.slice(1), ""); }
+      continue;
+    }
+    for(const line of lines){
+      let l = line.trim();
+      if(l.startsWith(">")) l = l.replace(/^>\s*/,"");
+      if(!l) continue;
+      if(LIST_ITEM_RE.test(l)){ out.push(l); continue; }
+      for(const piece of splitPara(cleanText(l), 100)) out.push(piece, "");
+    }
+  }
+  if(kws.length) out.push("", kws.map(k=>"#"+k).join(" "));
+  return out.join("\n").trim()+"\n";
+}
+function packZhihu(body, title){
+  const out = ["# "+title, ""];
+  const blocks = dropRules(body).split("\n\n").map(b=>b.trim()).filter(Boolean);
+  const first = blocks.find(b=>!b.startsWith("#"));
+  if(first){
+    const firstSentence = (first.split(/(?<=[。！？!?])/)[0]||"").trim();
+    if(firstSentence && !firstSentence.startsWith("先说结论")){
+      out.push("**先说结论："+firstSentence+"**", "");
+    }
+  }
+  out.push(...blocks);
+  return out.join("\n\n").trim()+"\n";
+}
+function packGzh(body, title){
+  const out = ["> 阅读约 "+readMinutes(body)+" 分钟", "", "**"+title+"**", ""];
+  for(const block of dropRules(body).split("\n\n")){
+    const b = block.trim(); if(!b) continue;
+    const lines = b.split("\n");
+    if(lines.every(l=>!l.trim() || /^#/.test(l.trim()))){
+      out.push("**"+cleanText(lines[0].replace(/^#+\s*/,"").trim())+"**", "");
+      continue;
+    }
+    out.push(...lines, "");
+  }
+  const noCode = body.replace(/```[\s\S]*?```/g,"");
+  const items = [];
+  for(const line of noCode.split("\n")){
+    const m = line.match(LIST_ITEM_RE);
+    if(m && items.length<5 && !items.includes(m[1].trim())) items.push(m[1].trim());
+  }
+  if(items.length) out.push("", "---", "", "**今日行动清单**", "", items.map((it,i)=>(i+1)+". "+it).join("\n"));
+  out.push("", "— END —");
+  return out.join("\n").trim()+"\n";
+}
+
+/* ---------- 主转换 ---------- */
+function convertAll(){
+  const raw = stripComments($("input").value);
+  if(!raw.trim()){ $("msg").textContent = "先粘贴文章内容"; return; }
+  const [meta, rest] = parseMeta(raw);
+  const [t, body] = extractTitle(rest);
+  const title = meta["标题"] || meta["title"] || t;
+  if(!title){ $("msg").textContent = "未找到标题：第一行请用 `# 标题`，或在元数据行写 `> 标题: xxx`"; return; }
+  $("msg").textContent = "";
+  const [stashed, stash] = stashCode(body);
+  CURRENT = {
+    toutiao: restoreCode(packToutiao(stashed, title), stash, "toutiao"),
+    zhihu: restoreCode(packZhihu(stashed, title), stash, "zhihu"),
+    gzh: restoreCode(packGzh(stashed, title), stash, "gzh")
+  };
+  ACTIVE = "toutiao";
+  $("out").value = CURRENT.toutiao;
+  $("resultCard").hidden = false;
+  $("resultCard").scrollIntoView({behavior:"smooth"});
+}
+
+/* ---------- 输出操作 ---------- */
+function switchTab(p){
+  ACTIVE = p;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.p===p));
+  $("out").value = CURRENT[p];
+}
+function copyOut(){
+  const v = $("out").value;
+  const ok = ()=>{ $("copyTip").textContent = "已复制 ✓"; setTimeout(()=>$("copyTip").textContent="",2000); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(v).then(ok).catch(()=>fallbackCopy(v,ok));
+  }else fallbackCopy(v,ok);
+}
+function fallbackCopy(v,ok){
+  const ta = document.createElement("textarea");
+  ta.value = v; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); ok(); }catch(e){ alert("复制失败，请手动全选复制"); }
+  document.body.removeChild(ta);
+}
+function downloadOut(){
+  const blob = new Blob([$("out").value], {type:"text/markdown;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "post-"+ACTIVE+".md";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function downloadAll(){
+  for(const p of ["toutiao","zhihu","gzh"]){
+    const blob = new Blob([CURRENT[p]], {type:"text/markdown;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "post-"+p+".md";
+    a.click(); URL.revokeObjectURL(a.href);
+  }
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.p));
+</script>
+</body>
+</html>
