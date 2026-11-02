@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CSV 打开全是乱码？GBK 和 UTF-8 的一场官司，10 分钟搞懂加解决</title>
+<title>CSV 文件打开全是乱码？GBK 和 UTF-8 的一场官司，10 分钟搞懂加解决</title>
 <meta name="description" content="CSV 文件打开乱码的本质是编码不匹配。这篇讲清 GBK 和 UTF-8 的区别、三种场景的解决方法，以及一个免费在线工具帮你自动识别编码并清理数据。纯本地运行，文件不上传。">
 <style>
   :root{--bg:#fafafa;--ink:#1a1a2e;--sub:#555;--accent:#e74c3c;--accent2:#3498db;--line:#ddd}
@@ -25,7 +25,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>CSV 打开全是乱码？GBK 和 UTF-8 的一场官司，10 分钟搞懂加解决</h1>
+  <h1>CSV 文件打开全是乱码？GBK 和 UTF-8 的一场官司，10 分钟搞懂加解决</h1>
   <p class="sub">从 Excel 到 Python 到在线工具，一篇讲透编码问题的来龙去脉和三种场景的解法。</p>
 
   <h2>乱码的根源：同一串字节，两本字典</h2>
@@ -37,12 +37,12 @@
   <h2>判断：你的文件是哪种编码</h2>
   <p>三个线索按可靠度排序：</p>
   <p>1. <b>问出处</b>：国内老系统、Excel 中文版"另存为 CSV"→ 大概率 GBK；新系统、网页导出、Mac/Linux → 大概率 UTF-8</p>
-  <p>2. <b>看乱码形态</b>："鏁版嵁"类汉字 → GBK 被当 UTF-8 读；"æ•°æ®"类西文 → UTF-8 被当 GBK 读</p>
-  <p>3. <b>试验</b>：用能切换编码的工具各试一次，10 秒钟的事</p>
+  <p>2. <b>看乱码形态</b>："鏁版嵁"类汉字 → GBK 被当 UTF-8 读了；"æ•°æ®"类西文 → UTF-8 被当 GBK 读了</p>
+  <p>3. <b>试验</b>：不确定就用能切换编码的工具各试一次，10 秒钟的事</p>
 
   <h2>解决：分三种场景</h2>
   <p><b>场景一：Excel 打开乱码（最常见）</b></p>
-  <pre>方法 A：新建空白 Excel → 数据 → 从文本/CSV 导入 → 选文件时在"文件原始格式"里选编码
+  <pre>方法 A（不改动文件）：新建空白 Excel → 数据 → 从文本/CSV 导入 → 选文件时在"文件原始格式"里选编码
 方法 B：用记事本打开 CSV → 另存为 → 编码选 UTF-8（带 BOM 更稳）→ 再用 Excel 打开</pre>
   <p><b>场景二：程序里读乱码</b></p>
   <pre>Python: pd.read_csv('file.csv', encoding='gbk')
@@ -54,7 +54,7 @@ Python: open('file.csv', encoding='utf-8')</pre>
   <p>如果你不想纠结编码细节：用支持<b>自动识别编码</b>的工具处理——自动先按 UTF-8 严格解码，失败自动切 GBK，拖进去就能用，乱码判断的事交给工具。顺手还能把重复行和空行一起清了。</p>
 
   <div class="tool-cta">
-    <a href="/csv-cleaner/">→ 打开 CSV 清理器（免费 · 纯本地 · 文件不上传）</a>
+    <a href="/csv-cleaner/">→ 打开 CSV 清理器（免费 · 纯本地 · 自动识别编码 · 文件不上传）</a>
   </div>
 
   <div class="tip">
