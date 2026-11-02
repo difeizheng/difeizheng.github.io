@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSV 去重的 3 种方法：Excel / Python / 在线工具（含优缺点对比）</title>
+<meta name="description" content="CSV 去重的 3 种方法：Excel 条件格式标记法、Python 脚本批量法、在线工具一键法。含每种方法的适用场景、优缺点对比和操作步骤，附一个免费在线工具。">
+<style>
+  :root{--bg:#fafafa;--ink:#1a1a2e;--sub:#555;--accent:#e74c3c;--accent2:#3498db;--line:#ddd}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:17px/1.8 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:32px 20px}
+  h1{font-size:28px;margin:8px 0 6px}
+  .sub{color:var(--sub);margin-bottom:24px}
+  h2{font-size:20px;margin:28px 0 10px;color:var(--accent)}
+  p{margin:10px 0}
+  pre{background:#1a1a2e;color:#eee;border-radius:8px;padding:14px;overflow-x:auto;font-size:14px;margin:12px 0}
+  code{background:#eee;border-radius:3px;padding:2px 6px;font-size:14px}
+  table{border-collapse:collapse;width:100%;margin:14px 0}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:14px}
+  th{background:#1a2338;color:#fff}
+  .tool-cta{background:var(--accent);color:#fff;border-radius:10px;padding:14px 20px;margin:16px 0;text-align:center}
+  .tool-cta a{color:#fff;font-weight:700;text-decoration:none}
+  .tip{background:#fff3cd;border-radius:8px;padding:12px 16px;margin:12px 0;border-left:4px solid var(--accent)}
+  .back{margin-top:32px}
+  .back a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>CSV 去重的 3 种方法：Excel / Python / 在线工具（含优缺点对比）</h1>
+  <p class="sub">从"选中几万行手动删"到"一个脚本 3 秒搞定"，去重这件事的效率差距可以达到 100 倍。这篇讲三种方法的适用场景和操作步骤。</p>
+
+  <h2>方法一：Excel 条件格式标记法（适合 < 1 万行）</h2>
+  <p>1. 选中数据区域 → 开始 → 条件格式 → 重复值</p>
+  <p>2. 重复行会高亮显示 → 手动筛选删除</p>
+  <p><b>优点</b>：零门槛，所见即所得</p>
+  <p><b>缺点</b>：超过 1 万行会卡；只能标记不能自动删；关闭文件后标记消失</p>
+  <p><b>适合</b>：一次性处理小文件，或需要人工确认哪些该删</p>
+
+  <h2>方法二：Python 脚本批量法（适合 > 1 万行 或 需要重复执行）</h2>
+  <pre>import pandas as pd
+df = pd.read_csv('input.csv', encoding='utf-8')
+df_cleaned = df.drop_duplicates()
+df_cleaned.to_csv('output.csv', index=False, encoding='utf-8-sig')
+print(f'原始 {len(df)} 行 → 去重后 {len(df_cleaned)} 行')</pre>
+  <p><b>优点</b>：10 万行秒完成；可反复执行；逻辑可审计</p>
+  <p><b>缺点</b>：需要 Python 环境；编码问题要手动处理（GBK/UTF-8）</p>
+  <p><b>适合</b>：定期 recurring 的去重需求，或数据量大到 Excel 卡死</p>
+
+  <h2>方法三：在线工具一键法（适合临时需求 + 不想装环境）</h2>
+  <p>用支持<b>自动去重 + 编码识别</b>的在线工具——拖进去就能用，不需要装任何环境。</p>
+  <p><b>优点</b>：零门槛；浏览器里完成；文件不上传服务器</p>
+  <p><b>缺点</b>：单次处理量受浏览器内存限制（通常 10 万行以内）；不能保存处理逻辑供下次复用</p>
+  <p><b>适合</b>：临时收到一个文件要去重，或不想为此装 Python</p>
+
+  <h2>三方法对比速查</h2>
+  <table>
+    <tr><th></th><th>Excel 标记</th><th>Python 脚本</th><th>在线工具</th></tr>
+    <tr><td>门槛</td><td>零</td><td>需 Python 环境</td><td>零</td></tr>
+    <tr><td>10 万行</td><td>卡死</td><td>秒完成</td><td>可能卡</td></tr>
+    <tr><td>可重复执行</td><td>✗</td><td>✓</td><td>✓（如工具支持）</td></tr>
+    <tr><td>逻辑可审计</td><td>✗</td><td>✓</td><td>取决于工具</td></tr>
+    <tr><td>隐私</td><td>本地</td><td>本地</td><td>看工具（有的上传）</td></tr>
+  </table>
+
+  <h2>选择建议</h2>
+  <p><b>一次性小文件</b> → Excel 标记（最快出结果）</p>
+  <p><b>定期重复 + 大文件</b> → Python 脚本（一劳永逸）</p>
+  <p><b>临时 + 不想装环境</b> → 在线工具（注意选本地处理的）</p>
+
+  <div class="tool-cta">
+    <a href="/csv-cleaner/">→ 打开 CSV 清理器（免费 · 纯本地 · 自动识别编码 · 文件不上传）</a>
+  </div>
+
+  <div class="tip">
+    <b>一个进阶技巧</b>：如果你定期收到同样格式的 CSV 需要清洗，别每次手动操作——把清洗逻辑写成一个脚本或用支持"处理规则保存"的工具，下次一键执行。这就是"把重复劳动变成资产"。
+  </div>
+
+  <div class="back">
+    <a href="/">← 返回工具箱首页</a> · <a href="/prompt-builder/">提示词骨架生成器</a> · <a href="/resume-jd-matcher/">简历 JD 匹配器</a>
+  </div>
+</div>
+</body>
+</html>
