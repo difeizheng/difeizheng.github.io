@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSV 打开全是乱码？GBK 和 UTF-8 的一场官司，10 分钟搞懂加解决</title>
+<meta name="description" content="CSV 文件打开乱码的本质是编码不匹配。这篇讲清 GBK 和 UTF-8 的区别、三种场景的解决方法，以及一个免费在线工具帮你自动识别编码并清理数据。纯本地运行，文件不上传。">
+<style>
+  :root{--bg:#fafafa;--ink:#1a1a2e;--sub:#555;--accent:#e74c3c;--accent2:#3498db;--line:#ddd}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:17px/1.8 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:32px 20px}
+  h1{font-size:28px;margin:8px 0 6px}
+  .sub{color:var(--sub);margin-bottom:24px}
+  h2{font-size:20px;margin:28px 0 10px;color:var(--accent)}
+  p{margin:10px 0}
+  pre{background:#1a1a2e;color:#eee;border-radius:8px;padding:14px;overflow-x:auto;font-size:14px;margin:12px 0}
+  code{background:#eee;border-radius:3px;padding:2px 6px;font-size:14px}
+  .tool-cta{background:var(--accent);color:#fff;border-radius:10px;padding:14px 20px;margin:16px 0;text-align:center}
+  .tool-cta a{color:#fff;font-weight:700;text-decoration:none}
+  .tip{background:#fff3cd;border-radius:8px;padding:12px 16px;margin:12px 0;border-left:4px solid var(--accent)}
+  .back{margin-top:32px}
+  .back a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>CSV 打开全是乱码？GBK 和 UTF-8 的一场官司，10 分钟搞懂加解决</h1>
+  <p class="sub">从 Excel 到 Python 到在线工具，一篇讲透编码问题的来龙去脉和三种场景的解法。</p>
+
+  <h2>乱码的根源：同一串字节，两本字典</h2>
+  <p>计算机存的本质是数字，文字要显示，需要一本"数字→文字"的对照字典（编码表）。</p>
+  <p><b>GBK</b>：中文世界的老字典，收录了汉字和符号，一个汉字通常占 2 字节。</p>
+  <p><b>UTF-8</b>：国际通用新字典，汉字占 3 字节，兼容全球所有文字。</p>
+  <p>乱码的本质：<b>文件按字典 A 写入，你用字典 B 打开</b>——同样的字节，查出来的字完全不同。用 UTF-8 的字典读 GBK 文件，"数据"两个字就会显示成"鏁版嵁"这种天书。</p>
+
+  <h2>判断：你的文件是哪种编码</h2>
+  <p>三个线索按可靠度排序：</p>
+  <p>1. <b>问出处</b>：国内老系统、Excel 中文版"另存为 CSV"→ 大概率 GBK；新系统、网页导出、Mac/Linux → 大概率 UTF-8</p>
+  <p>2. <b>看乱码形态</b>："鏁版嵁"类汉字 → GBK 被当 UTF-8 读；"æ•°æ®"类西文 → UTF-8 被当 GBK 读</p>
+  <p>3. <b>试验</b>：用能切换编码的工具各试一次，10 秒钟的事</p>
+
+  <h2>解决：分三种场景</h2>
+  <p><b>场景一：Excel 打开乱码（最常见）</b></p>
+  <pre>方法 A：新建空白 Excel → 数据 → 从文本/CSV 导入 → 选文件时在"文件原始格式"里选编码
+方法 B：用记事本打开 CSV → 另存为 → 编码选 UTF-8（带 BOM 更稳）→ 再用 Excel 打开</pre>
+  <p><b>场景二：程序里读乱码</b></p>
+  <pre>Python: pd.read_csv('file.csv', encoding='gbk')
+Python: open('file.csv', encoding='utf-8')</pre>
+  <p><b>场景三：在工具之间传来传去总乱码</b></p>
+  <p>把团队约定统一成一种——<b>新文件一律 UTF-8</b>，存量 GBK 文件用工具批量转换一次，一劳永逸。</p>
+
+  <h2>懒人通道：自动识别编码的免费工具</h2>
+  <p>如果你不想纠结编码细节：用支持<b>自动识别编码</b>的工具处理——自动先按 UTF-8 严格解码，失败自动切 GBK，拖进去就能用，乱码判断的事交给工具。顺手还能把重复行和空行一起清了。</p>
+
+  <div class="tool-cta">
+    <a href="/csv-cleaner/">→ 打开 CSV 清理器（免费 · 纯本地 · 文件不上传）</a>
+  </div>
+
+  <div class="tip">
+    <b>预防两条规定</b>：① 团队约定唯一的导出编码（推荐 UTF-8），写进交付规范；② 处理前先看一眼有没有乱码迹象——带着乱码往下干活，返工的是整条流程。
+  </div>
+
+  <div class="back">
+    <a href="/">← 返回工具箱首页</a> · <a href="/resume-jd-matcher/">简历 JD 匹配器</a> · <a href="/prompt-builder/">提示词骨架生成器</a>
+  </div>
+</div>
+</body>
+</html>
