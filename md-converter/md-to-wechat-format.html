@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markdown 粘贴到公众号/知乎排版全乱？3 个原因和对应解法</title>
+<meta name="description" content="Markdown 粘贴到公众号、知乎、头条后格式全乱的 3 个原因：编辑器不认 Markdown 语法、平台白名单差异、换行规则不同。对应 3 种解法：手动重排、HTML 中转、平台适配转换器，附免费在线工具。">
+<style>
+  :root{--bg:#fafafa;--ink:#1a1a2e;--sub:#555;--accent:#8e44ad;--accent2:#3498db;--line:#ddd}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:17px/1.8 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:32px 20px}
+  h1{font-size:28px;margin:8px 0 6px}
+  .sub{color:var(--sub);margin-bottom:24px}
+  h2{font-size:20px;margin:28px 0 10px;color:var(--accent)}
+  p{margin:10px 0}
+  pre{background:#1a1a2e;color:#eee;border-radius:8px;padding:14px;overflow-x:auto;font-size:14px;margin:12px 0}
+  code{background:#eee;border-radius:3px;padding:2px 6px;font-size:14px}
+  table{border-collapse:collapse;width:100%;margin:14px 0}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:14px}
+  th{background:#1a2338;color:#fff}
+  .tool-cta{background:var(--accent);color:#fff;border-radius:10px;padding:14px 20px;margin:16px 0;text-align:center}
+  .tool-cta a{color:#fff;font-weight:700;text-decoration:none}
+  .tip{background:#fff3cd;border-radius:8px;padding:12px 16px;margin:12px 0;border-left:4px solid var(--accent)}
+  .back{margin-top:32px}
+  .back a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Markdown 粘贴到公众号/知乎排版全乱？3 个原因和对应解法</h1>
+  <p class="sub">本地编辑器里层次分明的一篇 Markdown，粘进公众号标题变正文、代码块散架、列表消失。不是你写错了，是两边对"格式"的理解根本不同。这篇讲清 3 个原因和对应的 3 种解法。</p>
+
+  <h2>先看清现象：乱的是哪几样</h2>
+  <p>粘贴后最常见的四种翻车：</p>
+  <p>1. <code>#</code> <code>##</code> 原样出现——标题没变成标题，就是带井号的普通文字</p>
+  <p>2. <code>**加粗**</code> 连星号一起显示——粗体语法没被解析</p>
+  <p>3. 列表的短横线还在，但缩进和圆点消失</p>
+  <p>4. 代码块失去底色和等宽字体，散成一段普通文字</p>
+
+  <h2>原因一：平台编辑器不认 Markdown，只认富文本</h2>
+  <p>Markdown 是「纯文本 + 记号」：<code>## 标题</code> 本质是三个字符，不是格式。你的本地编辑器（Typora、VS Code、Obsidian）会实时渲染这些记号，所以看着是排版好的。</p>
+  <p>但公众号、知乎、头条的编辑器收到的是一段纯文本——记号还在，格式信息从来就不存在。它们只认富文本（带格式的 HTML），不认记号。</p>
+  <p><b>这就是根因</b>：不是复制粘贴坏了，是两边说的不是同一种语言。</p>
+
+  <h2>原因二：各平台的"标签白名单"不一样</h2>
+  <p>就算你把 Markdown 先转成 HTML 再粘贴，各平台还会按自己的白名单过滤：</p>
+  <p>· 公众号：过滤大部分外部样式和脚本，部分标签会被剥掉属性</p>
+  <p>· 知乎：对表格、代码块的支持有限制，复杂结构可能被简化</p>
+  <p>· 头条号：换行和空行容易被合并或吞掉</p>
+  <p>同一份 HTML，三个平台出来三个样——所以"一份 HTML 走天下"也不稳。</p>
+
+  <h2>原因三：换行规则差异</h2>
+  <p>Markdown 里「空行 = 分段」「行尾两个空格 = 强制换行」，而公众号习惯每行一个 <code>&lt;p&gt;</code>，头条对连续空行敏感。直接粘贴时这些差异全暴露。</p>
+
+  <h2>解法一：手动重排（适合偶尔发一篇）</h2>
+  <p>在平台编辑器里照着 Markdown 源码手动设置标题、加粗、列表。</p>
+  <p><b>优点</b>：零依赖，当场解决</p>
+  <p><b>缺点</b>：一篇 10 分钟起；三个平台要排三遍</p>
+  <p><b>适合</b>：发文频率低、篇幅短</p>
+
+  <h2>解法二：先转 HTML 再粘贴（适合愿意折腾的）</h2>
+  <p>用任意 Markdown 编辑器的「导出/预览 HTML」功能，复制渲染结果（富文本）粘到平台。</p>
+  <pre>1. Markdown 编辑器打开 → 预览模式
+2. 全选预览内容复制（这时复制到的是富文本）
+3. 粘贴到平台编辑器</pre>
+  <p><b>优点</b>：比手动快；保留大部分结构</p>
+  <p><b>缺点</b>：平台白名单还是会吞样式；代码块、表格仍需逐个检查</p>
+
+  <h2>解法三：按平台规则一键转换（适合一稿多发）</h2>
+  <p>用会「分平台适配」的转换工具：同一份 Markdown，按头条/知乎/公众号各自的规则分别生成——头条自动短段落，知乎结论前置，公众号加阅读时长和行动清单。</p>
+  <p><b>优点</b>：一次粘贴到位；一稿多发时省的时间最多</p>
+  <p><b>缺点</b>：依赖工具的平台规则更新</p>
+
+  <h2>三解法对比速查</h2>
+  <table>
+    <tr><th></th><th>手动重排</th><th>HTML 中转</th><th>平台适配转换</th></tr>
+    <tr><td>耗时/篇</td><td>10 分钟起</td><td>2-3 分钟</td><td>30 秒</td></tr>
+    <tr><td>三平台各一遍</td><td>要</td><td>要（分别调）</td><td>不用（分别生成）</td></tr>
+    <tr><td>格式还原度</td><td>高（手排）</td><td>中（被白名单削）</td><td>高（按平台规则出）</td></tr>
+    <tr><td>适合频率</td><td>月更</td><td>周更</td><td>日更/一稿多发</td></tr>
+  </table>
+
+  <div class="tool-cta">
+    <a href="/md-converter/">→ 打开 Markdown 平台转换器（免费 · 纯本地 · 头条/知乎/公众号三平台适配 · 内容不出浏览器）</a>
+  </div>
+
+  <div class="tip">
+    <b>一个进阶技巧</b>：别在平台编辑器里"从零排版"。正确的工作流是先写好 Markdown 母稿存本地，发布时按平台各生成一份——母稿是你的资产，平台编辑器只是出口。这样三个平台的内容永远一致，改稿也只改一处。
+  </div>
+
+  <div class="back">
+    <a href="/">← 返回工具箱首页</a> · <a href="/weekly-report-generator/">周报生成器</a> · <a href="/prompt-builder/">提示词骨架生成器</a>
+  </div>
+</div>
+</body>
+</html>
